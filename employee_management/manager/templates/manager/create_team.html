@@ -1,0 +1,255 @@
+{% extends 'employeeApp/base.html' %}
+
+{% block content %}
+
+<style>
+    .team-card {
+        max-width: 650px;
+        margin: 30px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .team-card h2 {
+        margin-bottom: 25px;
+        font-size: 26px;
+        color: #222;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 7px;
+        font-size: 14px;
+        box-sizing: border-box;
+        background: #fff;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+    }
+
+    .members-select {
+        min-height: 150px;
+        cursor: pointer;
+    }
+
+    .members-select option {
+        padding: 9px;
+    }
+
+    .form-help {
+        display: block;
+        margin-top: 7px;
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 11px 22px;
+        border: none;
+        border-radius: 7px;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .btn-secondary:hover {
+        background: #d1d5db;
+    }
+
+    @media (max-width: 600px) {
+        .team-card {
+            margin: 15px;
+            padding: 20px;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+</style>
+
+<div class="team-card">
+
+    <h2>Create Team</h2>
+
+    <form method="post" style="margin-top:20px">
+
+        {% csrf_token %}
+
+        <!-- Team Name -->
+
+        <div class="form-group">
+
+            <label for="team-name">
+                Team Name
+            </label>
+
+            <input
+                id="team-name"
+                name="name"
+                type="text"
+                required
+                class="form-control"
+                placeholder="Enter team name"
+            >
+
+        </div>
+
+
+        <!-- Department -->
+
+        <div class="form-group">
+
+            <label for="department">
+                Department
+            </label>
+
+            <select
+                id="department"
+                name="department"
+                required
+                class="form-control"
+            >
+
+                <option value="">
+                    Select Department
+                </option>
+
+                {% for d in departments %}
+
+                    <option value="{{ d.id }}">
+                        {{ d.name }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- Team Members -->
+
+        <div class="form-group">
+
+            <label for="members">
+                Team Members
+            </label>
+
+            <select
+                id="members"
+                name="members"
+                multiple
+                class="form-control members-select"
+            >
+
+                {% for employee in employees %}
+
+                    <option value="{{ employee.id }}">
+                        {{ employee.name }} - {{ employee.role }}
+                    </option>
+
+                {% empty %}
+
+                    <option disabled>
+                        No employees available
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <small class="form-help">
+                Hold Ctrl (Windows) or Command (Mac) to select multiple employees.
+            </small>
+
+        </div>
+
+
+        <!-- Description -->
+
+        <div class="form-group">
+
+            <label for="description">
+                Description
+            </label>
+
+            <textarea
+                id="description"
+                name="description"
+                rows="4"
+                class="form-control"
+                placeholder="Enter team description..."
+            ></textarea>
+
+        </div>
+
+
+        <!-- Buttons -->
+
+        <div class="form-actions">
+
+            <button
+                class="btn btn-primary"
+                type="submit"
+            >
+                Create Team
+            </button>
+
+            <a
+                href="{% url 'manager_team' %}"
+                class="btn btn-secondary"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

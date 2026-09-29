@@ -1,0 +1,192 @@
+{% extends 'employeeApp/base.html' %}
+{% block title %}
+    Employee Profile
+{% endblock %}
+{% block content %}
+    <style>
+        .profile {
+            max-width:950px;
+            margin:auto;
+        }
+        .profile h2 {
+            margin-bottom:18px;
+        }
+        .grid {
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:14px;
+        }
+        .item {
+            background:#fff;
+            padding:15px;
+            border-radius:7px;
+            border:1px solid #eee;
+        }
+        .label {
+            font-size:12px;
+            color:#777;
+        }
+        .value {
+            margin-top:5px;
+            font-size:16px;
+        }
+        .actions {
+            margin-top:20px;
+        }
+        @media(max-width:700px) {
+            .grid {
+                grid-template-columns:1fr;
+            }
+        }
+    </style>
+    <div class="profile">
+        <h2>
+            {{ employee.name }}
+            's Profile
+        </h2>
+        <div class="grid">
+            <div class="item">
+                <div class="label">
+                    Name
+                </div>
+                <div class="value">
+                    {{ employee.name }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Email
+                </div>
+                <div class="value">
+                    {{ employee.email }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Employee ID
+                </div>
+                <div class="value">
+                    {{ employee.employee_id|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Role
+                </div>
+                <div class="value">
+                    {{ employee.get_role_display }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Phone
+                </div>
+                <div class="value">
+                    {{ employee.phone|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Date of Birth
+                </div>
+                <div class="value">
+                    {{ employee.Date_of_birth|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Address
+                </div>
+                <div class="value">
+                    {{ employee.address|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    City
+                </div>
+                <div class="value">
+                    {{ employee.city|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Gender
+                </div>
+                <div class="value">
+                    {{ employee.gender|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Manager
+                </div>
+                <div class="value">
+                    {{ employee.manager.name|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Department
+                </div>
+                <div class="value">
+                    {{ employee.department.name|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Designation
+                </div>
+                <div class="value">
+                    {{ employee.designation|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Status
+                </div>
+                <div class="value">
+                    {% if employee.status %}
+                        Active
+                    {% else %}
+                        Inactive
+                    {% endif %}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Joining Date
+                </div>
+                <div class="value">
+                    {{ employee.joining_date|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Salary
+                </div>
+                <div class="value">
+                    {{ employee.salary|default:'-' }}
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">
+                    Emergency Contact
+                </div>
+                <div class="value">
+                    {{ employee.Emergency_contact|default:'-' }}
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <a class="btn secondary" href="{% url 'employee_list' %}">
+                Back
+            </a>
+            {% if user.role == 'HR' %}
+                <a class="btn warning-btn" href="{% url 'employee_edit' employee.id %}">
+                    Edit
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

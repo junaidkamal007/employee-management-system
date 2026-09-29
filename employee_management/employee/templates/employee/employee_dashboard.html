@@ -1,0 +1,167 @@
+{% extends 'employeeApp/base.html' %}
+{% block title %}
+    Employee Dashboard
+{% endblock %}
+{% block content %}
+    <style>
+        .dash {
+            max-width:1000px;
+            margin:auto;
+        }
+        .grid {
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:18px;
+            margin-top:22px;
+        }
+        .item {
+            background:#fff;
+            border-radius:9px;
+            padding:20px;
+            box-shadow:0 2px 8px rgba(0,0,0,.06);
+        }
+
+        .team-members-list{
+            list-style-type: none;
+            margin-top: 5px;
+        }
+        @media(max-width:700px) {
+            .grid {
+                grid-template-columns:1fr;
+            }
+        }
+    </style>
+    <div class="dash">
+        <h1>
+            Employee Dashboard
+        </h1>
+        {% if employee %}
+            <p style="margin-top:6px">
+                Welcome,
+                {{ employee.name }}
+            </p>
+            <div class="grid">
+                <div class="item">
+                    <h3>
+                        My Profile
+                    </h3>
+                    <p style="margin:10px 0">
+                        {{ employee.email }}
+                    </p>
+                    <p>
+                        {{ employee.get_role_display }}
+                    </p>
+                    <a href="{% url 'view_employee' employee.id %}" class="btn primary" style="margin-top:14px">
+                        View My Profile
+                    </a>
+                </div>
+                <div class="item">
+                    <h3>
+                        My Attendance
+                    </h3>
+                    <p style="margin:10px 0">
+                        Check in and check out from the attendance page.
+                    </p>
+                    <a href="{% url 'attendance_list' %}" class="btn success-btn">
+                        Open Attendance
+                    </a>
+                    <a href="{% url 'leave_list' %}" class="btn warning-btn">
+                        My Leave Requests
+                    </a>
+                </div>
+            </div>
+            <div class="item" style="margin-top:18px">
+                <h3>
+                    Leave
+                </h3>
+                <p style="margin:10px 0">
+                    Need time off? Send a leave request to your manager.
+                </p>
+                <a href="{% url 'request_leave' %}" class="btn warning-btn">
+                    Request Leave
+                </a>
+                <a href="{% url 'leave_list' %}" class="btn secondary">
+                    View Requests
+                </a>
+            </div>
+            <div class="item" style="margin-top:18px">
+                <h3>
+                    My Team
+                </h3>
+                {% for team in teams %}
+                    <div style="padding:14px 0;border-bottom:1px solid #eee;">
+                        <strong style="margin-bottom: 5px;">
+                            {{ team.name }}
+                        </strong>
+                        <p>
+                            Department:
+                            {{ team.department.name|default:'-' }}
+                        </p>
+                        
+                        <p><strong>Manager:</strong> {{ team.manager.name }}</p>
+
+                        <p style="margin-top: 15px;"><strong>Team Members:</strong></p>
+
+                        <ul class="team-members-list">
+                            {% for member in team.members.all %}
+                                <li>{{ member.name }}</li>
+                            {% empty %}
+                                <li>No team members assigned.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% empty %}
+                    <p style="margin-top:10px">
+                        You are not assigned to a team yet.
+                    </p>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="item" style="margin-top:20px">
+                Employee profile not found.
+            </div>
+        {% endif %}
+        <div class="item" style="margin-top: 18px;">
+
+    <h3>🔔 Updates</h3>
+
+    {% if notifications %}
+
+        {% for notification in notifications %}
+
+            <div
+                style="
+                    padding: 12px 0;
+                    border-bottom: 1px solid #eee;
+                "
+            >
+
+                <strong>
+                    {{ notification.message }}
+                </strong>
+
+                <p
+                    style="
+                        margin-top: 5px;
+                        color: #777;
+                        font-size: 13px;
+                    "
+                >
+                    {{ notification.created_at|date:"d M Y, h:i A" }}
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p style="margin-top: 10px;">
+            No updates yet.
+        </p>
+
+    {% endif %}
+
+</div>
+    </div>
+{% endblock %}

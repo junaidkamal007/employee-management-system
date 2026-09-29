@@ -1,0 +1,648 @@
+{% extends 'employeeApp/base.html' %}
+
+{% block title %}
+    Attendance
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .att-wrap {
+        max-width: 1250px;
+        margin: auto;
+    }
+
+    .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filters {
+        background: #fff;
+        padding: 18px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .filter-group label {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        padding: 9px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        min-width: 180px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 14px 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    th {
+        background: #fafafa;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .present {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .absent {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .late {
+        background: #fff8e1;
+        color: #8d6e00;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 22px;
+        flex-wrap: wrap;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .pagination a {
+        background: #1976d2;
+        color: #fff;
+    }
+
+    .pagination .current {
+        background: #eee;
+        color: #222;
+        font-weight: 600;
+    }
+
+    .pagination .disabled {
+        background: #eee;
+        color: #999;
+    }
+
+    .page-info {
+        text-align: center;
+        margin-top: 10px;
+        color: #666;
+        font-size: 14px;
+    }
+</style>
+
+
+<div class="att-wrap">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="top">
+
+        <div>
+
+            <h2>
+                Attendance
+            </h2>
+
+            {% if user.role == 'HR' %}
+
+                <p>
+                    All employees' attendance
+                </p>
+
+            {% elif user.role == 'MANAGER' %}
+
+                <p>
+                    Your attendance and your team's attendance
+                </p>
+
+            {% else %}
+
+                <p>
+                    Your attendance
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Check In / Check Out Buttons -->
+
+        <div class="actions">
+
+            {% if user.role == 'HR' %}
+
+                <a
+                    href="{% url 'mark_attendance' %}"
+                    class="btn success-btn"
+                >
+                    + Mark Attendance
+                </a>
+
+            {% endif %}
+
+
+            <!-- Check In -->
+
+            <form
+                method="post"
+                action="{% url 'check_in' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn success-btn"
+                    {% if today_record and today_record.check_in %}
+                        disabled
+                    {% endif %}
+                >
+                    Check In
+                </button>
+
+            </form>
+
+
+            <!-- Check Out -->
+
+            <form
+                method="post"
+                action="{% url 'check_out' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn primary"
+                    {% if not today_record or not today_record.check_in or today_record.check_out %}
+                        disabled
+                    {% endif %}
+                >
+                    Check Out
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TODAY'S ATTENDANCE
+    ====================================================== -->
+
+    {% if today_record %}
+
+        <div
+            class="card"
+            style="margin-bottom: 18px;"
+        >
+
+            <strong>
+                Today's Attendance:
+            </strong>
+
+            &nbsp;
+
+            Check In:
+            {{ today_record.check_in|default:'-' }}
+
+            &nbsp; | &nbsp;
+
+            Check Out:
+            {{ today_record.check_out|default:'-' }}
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         SEARCH AND FILTER
+    ====================================================== -->
+
+    <div class="filters">
+
+        <form
+            method="get"
+            class="filter-form"
+        >
+
+            <!-- Search -->
+
+            <div class="filter-group">
+
+                <label for="search">
+                    Search Employee
+                </label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    placeholder="Name or email"
+                    value="{{ search_query }}"
+                >
+
+            </div>
+
+
+            <!-- Status -->
+
+            <div class="filter-group">
+
+                <label for="status">
+                    Status
+                </label>
+
+                <select
+                    id="status"
+                    name="status"
+                >
+
+                    <option value="">
+                        All Status
+                    </option>
+
+                    <option
+                        value="Present"
+                        {% if status_filter == 'Present' %}
+                            selected
+                        {% endif %}
+                    >
+                        Present
+                    </option>
+
+                    <option
+                        value="Absent"
+                        {% if status_filter == 'Absent' %}
+                            selected
+                        {% endif %}
+                    >
+                        Absent
+                    </option>
+
+                    <option
+                        value="Late"
+                        {% if status_filter == 'Late' %}
+                            selected
+                        {% endif %}
+                    >
+                        Late
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Date -->
+
+            <div class="filter-group">
+
+                <label for="date">
+                    Date
+                </label>
+
+                <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    value="{{ date_filter }}"
+                >
+
+            </div>
+
+
+            <!-- Search Button -->
+
+            <button
+                type="submit"
+                class="btn primary"
+            >
+                Search / Filter
+            </button>
+
+
+            <!-- Clear Filters -->
+
+            <a
+                href="{% url 'attendance_list' %}"
+                class="btn secondary"
+            >
+                Clear
+            </a>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         ATTENDANCE TABLE
+    ====================================================== -->
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Employee
+                    </th>
+
+                    <th>
+                        Department
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Check In
+                    </th>
+
+                    <th>
+                        Check Out
+                    </th>
+
+                    <th>
+                        Remarks
+                    </th>
+
+                    {% if user.role == 'HR' %}
+
+                        <th>
+                            Actions
+                        </th>
+
+                    {% endif %}
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for attendance in attendances %}
+
+                    <tr>
+
+                        <td>
+                            {{ attendance.employee.name }}
+                        </td>
+
+                        <td>
+                            {{ attendance.employee.department|default:'-' }}
+                        </td>
+
+                        <td>
+                            {{ attendance.date }}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="
+                                    status
+
+                                    {% if attendance.status == 'Present' %}
+                                        present
+
+                                    {% elif attendance.status == 'Absent' %}
+                                        absent
+
+                                    {% else %}
+                                        late
+                                    {% endif %}
+                                "
+                            >
+                                {{ attendance.status }}
+                            </span>
+
+                        </td>
+
+                        <td>
+                            {{ attendance.check_in|default:'-' }}
+                        </td>
+
+                        <td>
+                            {{ attendance.check_out|default:'-' }}
+                        </td>
+
+                        <td>
+                            {{ attendance.remarks|default:'-' }}
+                        </td>
+
+
+                        {% if user.role == 'HR' %}
+
+                            <td>
+
+                                <a
+                                    href="{% url 'edit_attendance' attendance.id %}"
+                                    class="btn warning-btn"
+                                >
+                                    Edit
+                                </a>
+
+                                <a
+                                    href="{% url 'delete_attendance' attendance.id %}"
+                                    class="btn danger"
+                                >
+                                    Delete
+                                </a>
+
+                            </td>
+
+                        {% endif %}
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            style="
+                                text-align: center;
+                                padding: 30px;
+                            "
+                        >
+                            No attendance records found.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAGINATION
+    ====================================================== -->
+
+    {% if page_obj.has_other_pages %}
+
+        <div class="pagination">
+
+            <!-- Previous -->
+
+            {% if page_obj.has_previous %}
+
+                <a
+                    href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&status={{ status_filter }}&date={{ date_filter }}"
+                >
+                    Previous
+                </a>
+
+            {% else %}
+
+                <span class="disabled">
+                    Previous
+                </span>
+
+            {% endif %}
+
+
+            <!-- Page Numbers -->
+
+            {% for number in page_obj.paginator.page_range %}
+
+                {% if page_obj.number == number %}
+
+                    <span class="current">
+                        {{ number }}
+                    </span>
+
+                {% else %}
+
+                    <a
+                        href="?page={{ number }}&search={{ search_query }}&status={{ status_filter }}&date={{ date_filter }}"
+                    >
+                        {{ number }}
+                    </a>
+
+                {% endif %}
+
+            {% endfor %}
+
+
+            <!-- Next -->
+
+            {% if page_obj.has_next %}
+
+                <a
+                    href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&status={{ status_filter }}&date={{ date_filter }}"
+                >
+                    Next
+                </a>
+
+            {% else %}
+
+                <span class="disabled">
+                    Next
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="page-info">
+
+            Page
+            {{ page_obj.number }}
+            of
+            {{ page_obj.paginator.num_pages }}
+
+            &nbsp; | &nbsp;
+
+            Total Records:
+            {{ page_obj.paginator.count }}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

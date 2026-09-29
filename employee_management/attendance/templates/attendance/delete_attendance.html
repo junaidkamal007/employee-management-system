@@ -1,0 +1,22 @@
+{% extends 'employeeApp/base.html' %}
+{% block content %}
+    <div class="card" style="max-width:600px;margin:40px auto;text-align:center">
+        <h2>
+            Delete Attendance?
+        </h2>
+        <p style="margin:15px 0">
+            {{ attendance.employee.name }}
+            -
+            {{ attendance.date }}
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn danger" type="submit">
+                Yes, Delete
+            </button>
+            <a class="btn secondary" href="{% url 'attendance_list' %}">
+                Cancel
+            </a>
+        </form>
+    </div>
+{% endblock %}

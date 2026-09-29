@@ -1,0 +1,84 @@
+{% extends 'employeeApp/base.html' %}
+{% block title %}
+    Request Leave
+{% endblock %}
+{% block content %}
+    <style>
+        .form-wrap {
+            max-width:650px;
+            margin:auto;
+        }
+        .form-card {
+            background:#fff;
+            padding:28px;
+            border-radius:10px;
+            box-shadow:0 2px 10px rgba(0,0,0,.07);
+        }
+        .field {
+            margin-bottom:18px;
+        }
+        .field label {
+            display:block;
+            font-weight:600;
+            margin-bottom:7px;
+        }
+        .field input,.field textarea {
+            width:100%;
+            padding:10px;
+            border:1px solid #ccc;
+            border-radius:5px;
+        }
+        .errorlist {
+            color:#c62828;
+            margin:6px 0 0;
+            padding-left:18px;
+        }
+        .actions {
+            display:flex;
+            gap:10px;
+        }
+    </style>
+    <div class="form-wrap">
+        <div class="form-card">
+            <h2>
+                Request Leave
+            </h2>
+            <p style="margin:8px 0 22px">
+                Your request will be sent to
+                <strong>
+                    {{ manager.name }}
+                </strong>
+                .
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    {{ form.non_field_errors }}
+                {% endif %}
+                <div class="field">
+                    {{ form.start_date.label_tag }}
+                    {{ form.start_date }}
+                    {{ form.start_date.errors }}
+                </div>
+                <div class="field">
+                    {{ form.end_date.label_tag }}
+                    {{ form.end_date }}
+                    {{ form.end_date.errors }}
+                </div>
+                <div class="field">
+                    {{ form.reason.label_tag }}
+                    {{ form.reason }}
+                    {{ form.reason.errors }}
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn warning-btn">
+                        Submit Leave Request
+                    </button>
+                    <a href="{% url 'leave_list' %}" class="btn secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

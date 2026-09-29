@@ -1,0 +1,157 @@
+{%  extends 'employeeApp/base.html'%}
+{% block content %}
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+        body {
+            background:#f2f2f2;
+            height:100vh;
+        }
+        .container {
+            width:400px;
+            background:#fff;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,0.2);
+            margin-left: 450px;
+            margin-top: 60px;
+        }
+        h2 {
+            text-align:center;
+            margin-bottom:20px;
+        }
+        .form-group {
+            margin-bottom:15px;
+        }
+        label {
+            display:block;
+            margin-bottom:6px;
+            font-weight:bold;
+        }
+        input {
+            width:100%;
+            padding:10px;
+            border:1px solid #ccc;
+            border-radius:5px;
+            font-size:16px;
+        }
+        input:focus {
+            outline:none;
+            border-color:#007BFF;
+        }
+        button {
+            width:100%;
+            padding:12px;
+            border:none;
+            background:#007BFF;
+            color:white;
+            font-size:16px;
+            border-radius:5px;
+            cursor:pointer;
+        }
+        button:hover {
+            background:#0056b3;
+        }
+        .register-link {
+            text-align:center;
+            margin-top:15px;
+        }
+        .register-link a {
+            text-decoration:none;
+            color:#007BFF;
+        }
+        .register-link a:hover {
+            text-decoration:underline;
+        }
+
+        .password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: auto;
+            padding: 5px;
+            background: transparent;
+            color: #555;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .toggle-password:hover {
+            background: transparent;
+        }
+    </style>
+    <div class="container">
+        <h2>
+            Login
+        </h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">
+                    Email Address
+                </label>
+                <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required>
+            </div>
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required>
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        onclick="togglePassword('password', this)">
+                        👁️
+                    </button>
+                </div>
+            </div>
+            <button type="submit">
+                Login
+            </button>
+            <div class="register-link">
+                Don't have an account?
+                <a href="{% url 'register' %}">
+                    Register
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        button.textContent = "🙈";
+    } else {
+        input.type = "password";
+        button.textContent = "👁️";
+    }
+}
+</script>
+{% endblock %}

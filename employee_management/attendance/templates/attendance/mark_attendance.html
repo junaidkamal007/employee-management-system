@@ -1,0 +1,26 @@
+{% extends 'employeeApp/base.html' %}
+{% block content %}
+    <div class="card" style="max-width:700px;margin:auto">
+        <h2 style="margin-bottom:20px">
+            {{ title|default:'Mark Attendance' }}
+        </h2>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div style="margin-bottom:15px">
+                    <label style="display:block;font-weight:600;margin-bottom:6px">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+            <button class="btn primary" type="submit">
+                Save
+            </button>
+            <a href="{% url 'attendance_list' %}" class="btn secondary">
+                Cancel
+            </a>
+        </form>
+    </div>
+{% endblock %}

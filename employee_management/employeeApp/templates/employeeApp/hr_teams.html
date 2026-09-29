@@ -1,0 +1,170 @@
+{% extends "employeeApp/base.html" %}
+
+{% block title %}All Teams{% endblock %}
+
+{% block content %}
+
+
+<style>
+.dashboard-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 25px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.teams-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(280px, 1fr)
+    );
+    gap: 20px;
+}
+
+.team-card {
+    background: white;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.team-card h2 {
+    margin-bottom: 15px;
+}
+
+.team-card p {
+    margin: 10px 0;
+}
+
+.members-list {
+    padding-left: 20px;
+}
+
+.members-list li {
+    margin: 8px 0;
+}
+
+.members-list span {
+    color: #666;
+    font-size: 13px;
+}
+
+.btn {
+    padding: 10px 16px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.empty-state {
+    padding: 30px;
+    text-align: center;
+    background: white;
+    border-radius: 10px;
+}
+</style>
+
+
+
+
+
+
+<div class="dashboard-container">
+
+    <div class="dashboard-header">
+        <div>
+            <h1>All Teams</h1>
+            <p>View all teams and their members</p>
+        </div>
+
+        <a href="{% url 'home' %}" class="btn">
+            Back to Dashboard
+        </a>
+    </div>
+
+    {% if teams %}
+
+        <div class="teams-grid">
+
+            {% for team in teams %}
+
+                <div class="team-card">
+
+                    <h2>{{ team.name }}</h2>
+
+                    <p>
+                        <strong>Department:</strong>
+                        {{ team.department.name }}
+                    </p>
+
+                    <p>
+                        <strong>Manager:</strong>
+                        {{ team.manager.name }}
+                    </p>
+
+                    <p>
+                        <strong>Description:</strong>
+                        {% if team.description %}
+                            {{ team.description }}
+                        {% else %}
+                            No description available
+                        {% endif %}
+                    </p>
+
+                    <hr>
+
+                    <h3>Team Members</h3>
+
+                    {% if team.members.all %}
+
+                        <ul class="members-list">
+
+                            {% for member in team.members.all %}
+
+                                <li>
+                                    {{ member.name }}
+                                    <span>
+                                        ({{ member.role }})
+                                    </span>
+                                </li>
+
+                            {% empty %}
+
+                                <li>No members assigned.</li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    {% else %}
+
+                        <p>No members assigned.</p>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <p>No teams have been created yet.</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

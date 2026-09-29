@@ -1,0 +1,21 @@
+# Firebase service account key - NEVER commit this
+Secrets/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+.env
+
+# Django
+db.sqlite3
+*.log
+media/
+staticfiles/
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store

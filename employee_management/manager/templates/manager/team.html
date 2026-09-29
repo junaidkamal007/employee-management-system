@@ -1,0 +1,122 @@
+{% extends 'employeeApp/base.html' %}
+{% block title %}
+    My Team
+{% endblock %}
+{% block content %}
+    <style>
+        .wrap {
+            max-width:1000px;
+            margin:auto;
+        }
+        .team {
+            background:#fff;
+            border-radius:9px;
+            padding:20px;
+            margin-bottom:20px;
+            box-shadow:0 2px 8px rgba(0,0,0,.06);
+        }
+        table {
+            width:100%;
+            border-collapse:collapse;
+            margin-top:15px;
+        }
+        th,td {
+            padding:12px;
+            border-bottom:1px solid #eee;
+            text-align:left;
+        }
+        .actions {
+            white-space:nowrap;
+        }
+    </style>
+    <div class="wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <div>
+                <h2>
+                    My Team
+                </h2>
+                <p>
+                    Manage your teams and members.
+                </p>
+            </div>
+            <a class="btn success-btn" href="{% url 'create_team' %}">
+                + Create Team
+            </a>
+        </div>
+        {% for team in teams %}
+            <div class="team">
+                <h3>
+                    {{ team.name }}
+                </h3>
+                <p>
+                    Department:
+                    {{ team.department.name }}
+                </p>
+                {% if team.description %}
+                    <p style="margin-top:5px">
+                        {{ team.description }}
+                    </p>
+                {% endif %}
+                <a href="{% url 'add_team_member' team.id %}" class="btn primary" style="margin-top:12px">
+                    + Add Employee
+                </a>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Email
+                            </th>
+                            <th>
+                                Role
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in team.members.all %}
+                            <tr>
+                                <td>
+                                    {{ member.name }}
+                                </td>
+                                <td>
+                                    {{ member.email }}
+                                </td>
+                                <td>
+                                    {{ member.get_role_display }}
+                                </td>
+                                <td class="actions">
+                                    <a class="btn secondary" href="{% url 'view_employee' member.id %}">
+                                        View
+                                    </a>
+                                    <form method="post" action="{% url 'remove_team_member' team.id member.id %}" style="display:inline">
+                                        {% csrf_token %}
+                                        <button class="btn danger" type="submit">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    No members yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% empty %}
+            <div class="card">
+                <p>
+                    No teams found. Create your first team.
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

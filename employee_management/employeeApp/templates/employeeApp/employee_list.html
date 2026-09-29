@@ -1,0 +1,279 @@
+{% extends 'employeeApp/base.html' %}
+{% block title %}
+    Employees
+{% endblock %}
+{% block content %}
+    <style>
+        .wrap {
+            max-width:1250px;
+            margin:auto;
+        }
+        .head {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:15px;
+            margin-bottom:22px;
+        }
+        .head h2 {
+            font-size:28px;
+        }
+        .filters {
+            background:#fff;
+            padding:18px;
+            border-radius:8px;
+            margin-bottom:22px;
+            box-shadow:0 2px 8px rgba(0,0,0,.06);
+        }
+        .filter-form {
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+        }
+        .filter-form input,.filter-form select {
+            padding:10px 12px;
+            border:1px solid #ccc;
+            border-radius:5px;
+            min-width:150px;
+        }
+        .filter-form input {
+            flex:1;
+            min-width:220px;
+        }
+        table {
+            width:100%;
+            border-collapse:collapse;
+            background:#fff;
+        }
+        .table-wrap {
+            overflow-x:auto;
+            border-radius:8px;
+            box-shadow:0 2px 8px rgba(0,0,0,.06);
+        }
+        th,td {
+            text-align:left;
+            padding:14px 12px;
+            border-bottom:1px solid #eee;
+        }
+        th {
+            background:#fafafa;
+        }
+        .actions {
+            white-space:nowrap;
+        }
+        .status {
+            padding:5px 9px;
+            border-radius:14px;
+            font-size:12px;
+        }
+        .active {
+            background:#e8f5e9;
+            color:#2e7d32;
+        }
+        .inactive {
+            background:#ffebee;
+            color:#c62828;
+        }
+        .pagination {
+            display:flex;
+            justify-content:center;
+            gap:7px;
+            margin-top:22px;
+        }
+        .pagination a,.pagination span {
+            padding:8px 11px;
+            border-radius:4px;
+            text-decoration:none;
+            background:#616161;
+            color:#fff;
+        }
+        .pagination .current {
+            background:#1976d2;
+        }
+    </style>
+    <div class="wrap">
+        <div class="head">
+            <div>
+                <h2>
+                    Employee List
+                </h2>
+                <p>
+                    Access is filtered according to your role.
+                </p>
+            </div>
+            {% if user.role == 'HR' %}
+                <a href="{% url 'add_employee' %}" class="btn success-btn">
+                    + Add Employee
+                </a>
+            {% endif %}
+        </div>
+        <div class="filters">
+            <form method="get" class="filter-form">
+                <input name="search" value="{{ search }}" placeholder="Search name, ID, email or phone">
+                <select name="department">
+                    <option value="">
+                        All Departments
+                    </option>
+                    {% for d in departments %}
+                        <option value="{{ d.id }}" {% if selected_department == d.id|stringformat:'s' %}selected{% endif %}>
+                            {{ d.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <select name="gender">
+                    <option value="">
+                        All Genders
+                    </option>
+                    <option value="Male" {% if selected_gender == 'Male' %}selected{% endif %}>
+                        Male
+                    </option>
+                    <option value="Female" {% if selected_gender == 'Female' %}selected{% endif %}>
+                        Female
+                    </option>
+                    <option value="Other" {% if selected_gender == 'Other' %}selected{% endif %}>
+                        Other
+                    </option>
+                </select>
+                <select name="role">
+                    <option value="">
+                        All Roles
+                    </option>
+                    <option value="EMPLOYEE" {% if selected_role == 'EMPLOYEE' %}selected{% endif %}>
+                        Employee
+                    </option>
+                    <option value="INTERN" {% if selected_role == 'INTERN' %}selected{% endif %}>
+                        Intern
+                    </option>
+                    <option value="MANAGER" {% if selected_role == 'MANAGER' %}selected{% endif %}>
+                        Manager
+                    </option>
+                    <option value="HR" {% if selected_role == 'HR' %}selected{% endif %}>
+                        HR
+                    </option>
+                </select>
+                <select name="status">
+                    <option value="">
+                        All Status
+                    </option>
+                    <option value="active" {% if selected_status == 'active' %}selected{% endif %}>
+                        Active
+                    </option>
+                    <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>
+                        Inactive
+                    </option>
+                </select>
+                <button class="btn primary" type="submit">
+                    Search
+                </button>
+                <a class="btn secondary" href="{% url 'employee_list' %}">
+                    Clear
+                </a>
+            </form>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            Role
+                        </th>
+                        <th>
+                            Department
+                        </th>
+                        <th>
+                            Gender
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                        <th>
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                        <tr>
+                            <td>
+                                {{ employee.name }}
+                            </td>
+                            <td>
+                                {{ employee.email }}
+                            </td>
+                            <td>
+                                {{ employee.get_role_display }}
+                            </td>
+                            <td>
+                                {{ employee.department|default:'-' }}
+                            </td>
+                            <td>
+                                {{ employee.gender|default:'-' }}
+                            </td>
+                            <td>
+                                {% if employee.status %}
+                                    <span class="status active">
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="status inactive">
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="actions">
+                                <a href="{% url 'view_employee' employee.id %}" class="btn primary">
+                                    View
+                                </a>
+                                {% if user.role == 'HR' %}
+                                    <a href="{% url 'employee_edit' employee.id %}" class="btn warning-btn">
+                                        Edit
+                                    </a>
+                                    <a href="{% url 'employee_delete' employee.id %}" class="btn danger">
+                                        Delete
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" style="text-align:center;padding:30px">
+                                No employees found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if employees.has_other_pages %}
+            <div class="pagination">
+                {% if employees.has_previous %}
+                    <a href="?search={{ search }}&department={{ selected_department }}&gender={{ selected_gender }}&role={{ selected_role }}&status={{ selected_status }}&page={{ employees.previous_page_number }}">
+                        Previous
+                    </a>
+                {% endif %}
+                {% for num in employees.paginator.page_range %}
+                    {% if employees.number == num %}
+                        <span class="current">
+                            {{ num }}
+                        </span>
+                    {% else %}
+                        <a href="?search={{ search }}&department={{ selected_department }}&gender={{ selected_gender }}&role={{ selected_role }}&status={{ selected_status }}&page={{ num }}">
+                            {{ num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                {% if employees.has_next %}
+                    <a href="?search={{ search }}&department={{ selected_department }}&gender={{ selected_gender }}&role={{ selected_role }}&status={{ selected_status }}&page={{ employees.next_page_number }}">
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
